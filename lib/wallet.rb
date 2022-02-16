@@ -53,6 +53,7 @@ class Wallet
 
   def format_change_display(change)
     puts 'Your change is:'
+    puts "#{change.values.sum} coins are returned, as the following:"
     change.each do |coin, count|
       puts "#{count} #{coin}#{count > 1 ? 's' : ''}"
     end
