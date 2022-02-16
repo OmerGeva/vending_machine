@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 #
-# Wallet class dictates
+# Wallet class defines behavior of storing money and calculating change in coins
 #
 class Wallet
   attr_reader :remaining_change
@@ -38,13 +38,12 @@ class Wallet
     change = {}
     change_to_convert = @remaining_change
     coin_index = 0
-
     while change_to_convert.positive?
       current_coin = COIN_VALUES.keys[coin_index]
       if change_to_convert < COIN_VALUES[current_coin]
         coin_index += 1
       else
-        change[current_coin] = (change[current_coin] || 1) + 1
+        change[current_coin] = (change[current_coin] || 0) + 1
         change_to_convert -= COIN_VALUES[current_coin]
       end
     end

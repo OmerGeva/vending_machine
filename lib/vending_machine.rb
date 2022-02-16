@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 #
-# Vending machine class dictates
+# Vending machine class defines behavior of a vending machine, displaying and purchasing items.
 #
 class VendingMachine
   ORIGINAL_ITEM_COUNT = {
@@ -21,14 +21,13 @@ class VendingMachine
   end
 
   def purchase_item(wallet)
+    puts 'Please select an item (Enter a number)'
     item = find_item
-    return 'Please pick a valid option.' unless item
+    return unless item
 
     error = validate_option(item, wallet.remaining_change)
-    if error
-      puts error
-      return
-    end
+    puts error
+    return if error
 
     return_change(item, wallet)
     decrease_count(item)
@@ -47,7 +46,6 @@ class VendingMachine
   end
 
   def find_item
-    puts 'Please select an item (Enter a number)'
     choice = gets.chomp.to_i
     case choice
     when 1 then :pizzas
@@ -55,6 +53,8 @@ class VendingMachine
     when 3 then :burritos
     when 4 then :mashed_potatoes
     when 5 then :water
+    else
+      puts 'Please pick a valid option.'
     end
   end
 

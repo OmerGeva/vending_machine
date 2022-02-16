@@ -12,10 +12,9 @@ class Router
 
   def run
     puts 'Welcome to the vending machine!'
-    puts "You have #{wallet.remaining_change} to spend. Here are your options:"
+    puts "You have #{@wallet.remaining_change} to spend. Here are your options:"
     while @running
       display_actions
-      print '> '
       action = gets.chomp.to_i
       dispatch_action(action)
     end
@@ -30,6 +29,7 @@ class Router
     puts '3) See remaining balance'
     puts '4) Exit vending machine'
     puts 'What would you like to do? (Enter a number)'
+    print '> '
   end
 
   def dispatch_action(action)
