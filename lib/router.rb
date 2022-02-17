@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 #
-# Class that helps orchestrate actions based on user input
+# Router class that helps orchestrate actions based on user input
 #
 class Router
   def initialize(vending_machine, wallet)

@@ -25,19 +25,15 @@ class Wallet
 
   def make_payment(amount)
     @remaining_change -= amount
-    give_back_change
+  end
+
+  def calculate_change(amount)
+    compute_change(amount)
   end
 
   private
 
-  def give_back_change
-    format_change_display(calculate_change)
-  end
-
-  def calculate_change
-    change = {}
-    change_to_convert = @remaining_change
-    coin_index = 0
+  def compute_change(change_to_convert, change = {}, coin_index = 0)
     while change_to_convert.positive?
       current_coin = COIN_VALUES.keys[coin_index]
       if change_to_convert < COIN_VALUES[current_coin]
@@ -49,13 +45,5 @@ class Wallet
     end
 
     change
-  end
-
-  def format_change_display(change)
-    puts 'Your change is:'
-    puts "#{change.values.sum} coins are returned, as the following:"
-    change.each do |coin, count|
-      puts "#{count} #{coin}#{count > 1 ? 's' : ''}"
-    end
   end
 end

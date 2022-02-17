@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require_relative 'not_enough_coins_error'
+
 #
 # Vending machine class defines behavior of a vending machine, displaying and purchasing items.
 #
@@ -12,8 +14,18 @@ class VendingMachine
     water: { count: 10, cost: 1.25 }
   }.freeze
 
+  ORIGINAL_COIN_COUNT = {
+    five: 20,
+    three: 20,
+    two: 20,
+    one: 20,
+    half: 20,
+    quarter: 20
+  }.freeze
+
   def initialize
     @remaining_items = ORIGINAL_ITEM_COUNT.dup
+    @remaining_coins = ORIGINAL_COIN_COUNT.dup
   end
 
   def display_items
@@ -26,12 +38,14 @@ class VendingMachine
     return unless item
 
     error = validate_option(item, wallet.remaining_change)
-    puts error
     return if error
 
-    return_change(item, wallet)
+    change = return_change(item, wallet)
     decrease_count(item)
-    puts 'Thank you for using the vending machine'
+
+    format_change_display(change)
+  rescue NotEnoughCoinsError => e
+    puts e.msg
   end
 
   private
@@ -43,6 +57,14 @@ class VendingMachine
       puts "#{i}) $#{values[:cost]} - #{item}"
     end
     puts '-------------------------'
+  end
+
+  def format_change_display(change)
+    puts 'Your change is:'
+    puts "#{change.values.sum} coins are returned, as the following:"
+    change.each do |coin, count|
+      puts "#{count} #{coin}#{count > 1 ? 's' : ''}"
+    end
   end
 
   def find_item
@@ -59,11 +81,14 @@ class VendingMachine
   end
 
   def validate_option(item, balance)
-    if @remaining_items[item][:count].zero?
-      "Sorry, there are no more available #{item}, please choose another option."
-    elsif @remaining_items[item][:cost] > balance
-      "You do not have enough money to buy #{item}."
-    end
+    error =
+      if @remaining_items[item][:count].zero?
+        "Sorry, there are no more available #{item}, please choose another option."
+      elsif @remaining_items[item][:cost] > balance
+        "You do not have enough money to buy #{item}."
+      end
+    puts error if error
+    error
   end
 
   def decrease_count(item)
@@ -71,6 +96,13 @@ class VendingMachine
   end
 
   def return_change(item, wallet)
+    change = wallet.calculate_change(wallet.remaining_change - @remaining_items[item][:cost])
+    change.each do |coin, count|
+      raise NotEnoughCoinsError if @remaining_coins[coin] < count
+
+      @remaining_coins[coin] -= count
+    end
     wallet.make_payment(@remaining_items[item][:cost])
+    change
   end
 end
